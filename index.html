@@ -53,6 +53,11 @@
       display: flex;
       justify-content: center;
     }
+    .restart-button {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -65,8 +70,8 @@
       <button onclick="setDirection('RIGHT')">Right</button>
     </div>
     <button onclick="setDirection('DOWN')">Down</button>
-    <button onclick="restartGame()">Restart</button>
   </div>
+  <button class="restart-button" onclick="restartGame()">Restart</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
