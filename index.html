@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Snake Game</title>
+  <title>Snake Eating</title>
   <style>
     body {
       margin: 0;
-      background-color: #111;
+      background-image: url('https://img.freepik.com/free-vector/bush-border_1308-3858.jpg?t=st=1744782113~exp=1744785713~hmac=1feae0d63baa6dfa9c7fb8532c81bad50fb885376db54ef74af6c7e6504242a9&w=826');
+      background-size: cover;
+      background-position: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -16,13 +18,24 @@
       color: #fff;
       font-family: 'Courier New', Courier, monospace;
     }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0f0;
+    }
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
     canvas {
       background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
       border: 5px solid #0f0;
       box-shadow: 0 0 20px #0f0, inset 0 0 10px #0a0;
       border-radius: 10px;
     }
-    #score {
+    #score, #time {
       font-size: 24px;
       margin-bottom: 10px;
       text-shadow: 0 0 10px #0f0;
@@ -32,18 +45,23 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 10px; /* Add spacing between rows */
     }
     .controls button {
       background: linear-gradient(145deg, #333, #444);
       color: #fff;
       border: 1px solid #0f0;
-      padding: 10px;
-      margin: 5px;
-      font-size: 16px;
+      padding: 8px; /* Adjust padding for smaller buttons */
+      font-size: 18px; /* Adjust font size for smaller buttons */
       cursor: pointer;
       border-radius: 5px;
       box-shadow: 0 4px #0a0;
       transition: all 0.2s ease;
+      width: 50px; /* Set fixed width for uniform size */
+      height: 50px; /* Set fixed height for uniform size */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .controls button:active {
       transform: translateY(2px);
@@ -52,26 +70,43 @@
     .controls .row {
       display: flex;
       justify-content: center;
+      gap: 10px; /* Add spacing between buttons in the same row */
     }
     .restart-button {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
+      margin-top: 10px;
+      align-self: flex-start;
+      background: linear-gradient(145deg, #333, #444);
+      color: #fff;
+      border: 1px solid #0f0;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 4px #0a0;
+      transition: all 0.2s ease;
+    }
+    .restart-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px #0a0;
     }
   </style>
 </head>
 <body>
+  <h1>Snake Eating</h1>
   <div id="score">Score: 0</div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-  <div class="controls">
-    <button onclick="setDirection('UP')">Up</button>
-    <div class="row">
-      <button onclick="setDirection('LEFT')">Left</button>
-      <button onclick="setDirection('RIGHT')">Right</button>
+  <div id="time">Time: 0s</div>
+  <div class="game-container">
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+      <button onclick="handleButtonPress('UP')">&#9650;</button> <!-- Up Arrow -->
+      <div class="row">
+        <button onclick="handleButtonPress('LEFT')">&#9664;</button> <!-- Left Arrow -->
+        <button onclick="handleButtonPress('RIGHT')">&#9654;</button> <!-- Right Arrow -->
+      </div>
+      <button onclick="handleButtonPress('DOWN')">&#9660;</button> <!-- Down Arrow -->
     </div>
-    <button onclick="setDirection('DOWN')">Down</button>
+    <button class="restart-button" onclick="handleRestart()">Restart</button>
   </div>
-  <button class="restart-button" onclick="restartGame()">Restart</button>
 
   <script>
     const canvas = document.getElementById("gameCanvas");
@@ -102,6 +137,14 @@
       }
 
       changingDirection = true;
+    }
+
+    function handleButtonPress(newDirection) {
+      setDirection(newDirection);
+    }
+
+    function handleRestart() {
+      restartGame();
     }
 
     function setDirection(newDirection) {
