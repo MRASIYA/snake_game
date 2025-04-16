@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    canvas {
+      background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+      border: 5px solid #0f0;
+      box-shadow: 0 0 20px #0f0, inset 0 0 10px #0a0;
+      border-radius: 10px;
+    }
+    #score {
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #0f0;
+    }
+    .controls {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .controls button {
+      background: linear-gradient(145deg, #333, #444);
+      color: #fff;
+      border: 1px solid #0f0;
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 4px #0a0;
+      transition: all 0.2s ease;
+    }
+    .controls button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px #0a0;
+    }
+    .controls .row {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Score: 0</div>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <div class="controls">
+    <button onclick="setDirection('UP')">Up</button>
+    <div class="row">
+      <button onclick="setDirection('LEFT')">Left</button>
+      <button onclick="setDirection('RIGHT')">Right</button>
+    </div>
+    <button onclick="setDirection('DOWN')">Down</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const box = 20;
+    let score = 0;
+
+    let snake = [{ x: 9 * box, y: 10 * box }];
+    let food = generateFood();
+
+    let direction = "RIGHT"; // Initialize direction
+    let changingDirection = false; // Prevent multiple direction changes in one frame
+
+    document.addEventListener("keydown", changeDirection);
+
+    function changeDirection(event) {
+      if (changingDirection) return;
+
+      if (event.key === "ArrowLeft" && direction !== "RIGHT") {
+        direction = "LEFT";
+      } else if (event.key === "ArrowUp" && direction !== "DOWN") {
+        direction = "UP";
+      } else if (event.key === "ArrowRight" && direction !== "LEFT") {
+        direction = "RIGHT";
+      } else if (event.key === "ArrowDown" && direction !== "UP") {
+        direction = "DOWN";
+      }
+
+      changingDirection = true;
+    }
+
+    function setDirection(newDirection) {
+      if (changingDirection) return;
+
+      if (newDirection === "LEFT" && direction !== "RIGHT") {
+        direction = "LEFT";
+      } else if (newDirection === "UP" && direction !== "DOWN") {
+        direction = "UP";
+      } else if (newDirection === "RIGHT" && direction !== "LEFT") {
+        direction = "RIGHT";
+      } else if (newDirection === "DOWN" && direction !== "UP") {
+        direction = "DOWN";
+      }
+
+      changingDirection = true;
+    }
+
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw snake
+      for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "#0f0" : "#0a0";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#0f0";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        ctx.strokeStyle = "#000";
+        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+      }
+
+      // Draw food
+      ctx.fillStyle = "#f00";
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#f00";
+      ctx.fillRect(food.x, food.y, box, box);
+
+      // Move snake
+      let snakeX = snake[0].x;
+      let snakeY = snake[0].y;
+
+      if (direction === "LEFT") snakeX -= box;
+      if (direction === "UP") snakeY -= box;
+      if (direction === "RIGHT") snakeX += box;
+      if (direction === "DOWN") snakeY += box;
+
+      // Check for eating food
+      if (snakeX === food.x && snakeY === food.y) {
+        score++;
+        document.getElementById("score").innerText = "Score: " + score;
+        food = generateFood();
+      } else {
+        snake.pop(); // Remove tail
+      }
+
+      // Game Over Conditions
+      if (
+        snakeX < 0 || snakeY < 0 ||
+        snakeX >= canvas.width || snakeY >= canvas.height ||
+        collision(snakeX, snakeY, snake)
+      ) {
+        clearInterval(game);
+        alert("Game Over! Your score: " + score);
+      }
+
+      // Add new head
+      let newHead = { x: snakeX, y: snakeY };
+      snake.unshift(newHead);
+
+      changingDirection = false; // Allow direction change for the next frame
+    }
+
+    function collision(x, y, array) {
+      for (let i = 0; i < array.length; i++) {
+        if (x === array[i].x && y === array[i].y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function generateFood() {
+      let newFood;
+      do {
+        newFood = {
+          x: Math.floor(Math.random() * 19 + 1) * box,
+          y: Math.floor(Math.random() * 19 + 1) * box,
+        };
+      } while (collision(newFood.x, newFood.y, snake)); // Ensure food doesn't spawn on the snake
+      return newFood;
+    }
+
+    let game = setInterval(drawGame, 100);
+  </script>
+</body>
+</html>
