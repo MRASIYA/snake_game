@@ -65,6 +65,7 @@
       <button onclick="setDirection('RIGHT')">Right</button>
     </div>
     <button onclick="setDirection('DOWN')">Down</button>
+    <button onclick="restartGame()">Restart</button>
   </div>
 
   <script>
@@ -78,6 +79,7 @@
 
     let direction = "RIGHT"; // Initialize direction
     let changingDirection = false; // Prevent multiple direction changes in one frame
+    let game;
 
     document.addEventListener("keydown", changeDirection);
 
@@ -187,7 +189,18 @@
       return newFood;
     }
 
-    let game = setInterval(drawGame, 100);
+    function restartGame() {
+      clearInterval(game); // Stop the current game
+      score = 0;
+      document.getElementById("score").innerText = "Score: " + score;
+      snake = [{ x: 9 * box, y: 10 * box }]; // Reset snake
+      direction = "RIGHT"; // Reset direction
+      food = generateFood(); // Generate new food
+      changingDirection = false;
+      game = setInterval(drawGame, 100); // Restart the game loop
+    }
+
+    game = setInterval(drawGame, 100);
   </script>
 </body>
 </html>
